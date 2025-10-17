@@ -1,17 +1,16 @@
 from netmiko import ConnectHandler
 from pprint import pprint
 
-device_ip = "<!!!REPLACEME with router IP address!!!>"
+device_ip = "10.0.15.61"
 username = "admin"
 password = "cisco"
 
 device_params = {
-    "device_type": "<!!!REPLACEME with device type for netmiko!!!>",
+    "device_type": "cisco_ios",
     "ip": device_ip,
     "username": username,
     "password": password,
 }
-
 
 def gigabit_status():
     ans = ""
@@ -19,16 +18,34 @@ def gigabit_status():
         up = 0
         down = 0
         admin_down = 0
-        result = ssh.send_command("<!!!REPLACEME with proper command!!!>", use_textfsm=True)
+
+        # ใช้ TextFSM template
+        result = ssh.send_command("show ip interface brief", use_textfsm=True)
+        status_list = []
+
         for status in result:
-            if <!!!Write code here!!!>:
-                <!!!Write code here!!!>
-                if <!!!Write code here!!!> == "up":
+            # ✅ ดึงชื่อ interface โดยตรวจทั้ง 2 แบบ
+            intf = status.get("intf") or status.get("interface")
+            if not intf:
+                continue  # ถ้าไม่มี key นี้ ข้ามเลย
+
+            line_status = status.get("status", "").lower()
+
+            # ✅ นับเฉพาะ GigabitEthernet interfaces
+            if "gigabitethernet" in intf.lower():
+                if line_status == "up":
                     up += 1
-                elif <!!!Write code here!!!> == "down":
+                elif line_status == "down":
                     down += 1
-                elif <!!!Write code here!!!> == "administratively down":
+                elif line_status == "administratively down":
                     admin_down += 1
-        ans = <!!!Write code here!!!>
+
+                status_list.append(f"{intf} {line_status}")
+
+        ans = (
+            ", ".join(status_list)
+            + f" -> {up} up, {down} down, {admin_down} administratively down"
+        )
+
         pprint(ans)
         return ans

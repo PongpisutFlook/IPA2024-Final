@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from restconf_final import create, delete, enable, disable, status
+from netmiko_final import gigabit_status
 
 
 #######################################################################################
@@ -94,13 +95,13 @@ while True:
         elif command == "status":
             responseMessage = status()
         elif command == "gigabit_status":
-            responseMessage = "Gigabit interface status not implemented."
-        elif command == "showrun":
-            with open("showrun.txt", "w") as f:
-                f.write("! running config\ninterface Gi0/1\n ip address 10.0.0.1 255.255.255.0\n!")
-            responseMessage = "ok"
-        else:
-            responseMessage = "Error: No command or unknown command"
+            responseMessage = gigabit_status()
+        # elif command == "showrun":
+        #     with open("showrun.txt", "w") as f:
+        #         f.write("! running config\ninterface Gi0/1\n ip address 10.0.0.1 255.255.255.0\n!")
+        #     responseMessage = "ok"
+        # else:
+        #     responseMessage = "Error: No command or unknown command"
         
 # 6. Complete the code to post the message to the Webex Teams room.
 
