@@ -15,6 +15,9 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from restconf_final import create, delete, enable, disable, status
 from netmiko_final import gigabit_status
+from ansible_final import showrun
+import glob
+
 
 
 #######################################################################################
@@ -96,12 +99,10 @@ while True:
             responseMessage = status()
         elif command == "gigabit_status":
             responseMessage = gigabit_status()
-        # elif command == "showrun":
-        #     with open("showrun.txt", "w") as f:
-        #         f.write("! running config\ninterface Gi0/1\n ip address 10.0.0.1 255.255.255.0\n!")
-        #     responseMessage = "ok"
-        # else:
-        #     responseMessage = "Error: No command or unknown command"
+        elif command == "showrun":
+            responseMessage = showrun()
+        else:
+            responseMessage = "Error: No command or unknown command"
         
 # 6. Complete the code to post the message to the Webex Teams room.
 
@@ -118,7 +119,8 @@ while True:
         # https://developer.webex.com/docs/basics for more detail
 
         if command == "showrun" and responseMessage == 'ok':
-            filename = "showrun.txt"
+            filename = glob.glob("show_run_*.txt")
+            filename = max(filename, key=os.path.getctime)
             fileobject = open(filename, "rb")
             filetype = "text/plain"
             postData = {
