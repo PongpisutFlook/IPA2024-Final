@@ -19,19 +19,16 @@ def gigabit_status():
         down = 0
         admin_down = 0
 
-        # ใช้ TextFSM template
         result = ssh.send_command("show ip interface brief", use_textfsm=True)
         status_list = []
 
         for status in result:
-            # ✅ ดึงชื่อ interface โดยตรวจทั้ง 2 แบบ
             intf = status.get("intf") or status.get("interface")
             if not intf:
-                continue  # ถ้าไม่มี key นี้ ข้ามเลย
+                continue
 
             line_status = status.get("status", "").lower()
 
-            # ✅ นับเฉพาะ GigabitEthernet interfaces
             if "gigabitethernet" in intf.lower():
                 if line_status == "up":
                     up += 1
